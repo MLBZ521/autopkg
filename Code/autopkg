@@ -2003,7 +2003,7 @@ def run_recipes(argv):
         )
     else:
         parser.set_usage(
-            f"Usage: %prog {verb} [options] [recipe ...]\n" "Run one or more recipes."
+            f"Usage: %prog {verb} [options] [recipe ...]\nRun one or more recipes."
         )
 
     # Parse arguments.
@@ -2682,12 +2682,39 @@ def new_recipe(argv):
         log_err(f"Failed to write recipe: {err}")
 
 
+def build_recipe_chain(argv):
+    """Build a new recipe chain"""
+    verb = argv[1]
+    parser = gen_common_parser()
+
+    parser.set_usage(
+        f"Usage: %prog {verb} [options] recipe_name\nBuild a recipe chain."
+    )
+
+    (_options, arguments) = common_parse(parser, argv)
+
+    if len(arguments) != 1:
+        log_err("Must specify exactly one recipe pathname!")
+        log_err(parser.get_usage())
+        return -1
+
+    # Okay, now what?
+    # 1. Load a recipe
+    # 2. Find all parents
+    # 3. Make one recipe
+    # 4. Save it in RecipeChains folder
+
+
 def main(argv):
     """Main routine"""
     # define our subcommands ('verbs')
     subcommands = {
         "help": {"function": display_help, "help": "Display this help"},
         "audit": {"function": audit, "help": "Audit one or more recipes."},
+        "build": {
+            "function": build_recipe_chain,
+            "help": "Build a recipe chain from a recipe",
+        },
         "info": {
             "function": get_info,
             "help": "Get info about configuration or a recipe",
