@@ -31,7 +31,6 @@ from urllib.parse import urlparse
 import yaml
 from autopkgcmd import common_parse, gen_common_parser, search_recipes
 from autopkglib.recipes import (
-    assemble_recipe,
     load_recipe,
     get_recipe_info,
     get_recipe_list,
@@ -1942,53 +1941,12 @@ def new_recipe(argv):
         log_err(f"Failed to write recipe: {err}")
 
 
-def build_recipe_chain(argv):
-    """Build a new recipe chain"""
-    verb = argv[1]
-    parser = gen_common_parser()
-
-    parser.set_usage(
-        f"Usage: %prog {verb} [options] recipe_name\nBuild a recipe chain."
-    )
-
-    (options, arguments) = common_parse(parser, argv)
-
-    override_dirs = options.override_dirs or get_override_dirs()
-    search_dirs = options.search_dirs or get_search_dirs()
-
-    if len(arguments) != 1:
-        log_err("Must specify exactly one recipe pathname!")
-        log_err(parser.get_usage())
-        return -1
-
-    # Okay, now what?
-    # 1. Load a recipe
-    # 2. Find all parents
-    # 3. Make one recipe
-    # 4. Save it in RecipeChains folder
-    recipe = assemble_recipe(arguments, override_dirs, search_dirs)
-    chain_dir = get_pref("RECIPE_CHAIN_DIR") or "~/Library/AutoPkg/RecipeChains"
-    chain_dir = os.path.expanduser(chain_dir)
-    if not os.path.exists(chain_dir):
-        os.makedirs(chain_dir, 0o755)
-    recipe_chain_path = os.path.join(chain_dir, arguments[0].removesuffix(".recipe"))
-    try:
-        with open(recipe_chain_path, "wb") as f:
-            plistlib.dump(recipe, f)
-    except OSError as err:
-        log_err(f"Can't write results to {recipe_chain_path}: {err.strerror}")
-
-
 def main(argv):
     """Main routine"""
     # define our subcommands ('verbs')
     subcommands = {
         "help": {"function": display_help, "help": "Display this help"},
         "audit": {"function": audit, "help": "Audit one or more recipes."},
-        "build": {
-            "function": build_recipe_chain,
-            "help": "Build a recipe chain from a recipe",
-        },
         "info": {
             "function": get_info,
             "help": "Get info about configuration or a recipe",
