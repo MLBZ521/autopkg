@@ -62,10 +62,6 @@ def log_err(msg):
 
 RE_KEYREF = re.compile(r"%(?P<key>[a-zA-Z_][a-zA-Z_0-9]*)%")
 
-# Supported recipe extensions
-RECIPE_EXTS = (".recipe", ".recipe.plist", ".recipe.yaml")
-
-
 # Set the global preferences object
 globalPreferences = Preferences()
 
