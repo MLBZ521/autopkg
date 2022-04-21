@@ -30,26 +30,6 @@ from urllib.parse import urlparse
 
 import yaml
 from autopkgcmd import common_parse, gen_common_parser, search_recipes
-from autopkglib.recipes import (
-    load_recipe,
-    get_recipe_info,
-    get_recipe_list,
-    locate_recipe,
-    recipe_in_override_dir,
-    recipe_from_external_repo
-)
-from autopkglib.prefs import (
-    get_search_dirs,
-    get_override_dirs
-)
-from autopkglib.git import (
-    GitError,
-    run_git
-)
-from autopkglib.repos import (
-    add_repo,
-    expand_repo_url,
-)
 from autopkglib import (
     AutoPackager,
     AutoPackagerError,
@@ -70,6 +50,17 @@ from autopkglib import (
     remove_recipe_extension,
     set_pref,
 )
+from autopkglib.git import GitError, run_git
+from autopkglib.prefs import get_override_dirs, get_search_dirs
+from autopkglib.recipes import (
+    get_recipe_info,
+    get_recipe_list,
+    load_recipe,
+    locate_recipe,
+    recipe_from_external_repo,
+    recipe_in_override_dir,
+)
+from autopkglib.repos import add_repo, expand_repo_url
 
 # Catch Python 2 wrappers with an early f-string. Message must be on a single line.
 _ = f"""{sys.version_info.major} It looks like you're running the autopkg tool with an incompatible version of Python. Please update your script to use autopkg's included Python (/usr/local/autopkg/python). AutoPkgr users please note that AutoPkgr 1.5.1 and earlier is NOT compatible with autopkg 2. """  # noqa

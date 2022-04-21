@@ -1,17 +1,14 @@
 #!/usr/local/autopkg/python
 
 import json
-from copy import deepcopy
-from typing import Optional, Union, IO, Any, Dict
-import appdirs
-import plistlib
 import os
+import plistlib
+from copy import deepcopy
+from typing import IO, Any, Dict, Optional, Union
 
-from .. import (
-    is_mac,
-    log_err,
-    get_pref,
-)
+import appdirs
+
+from .. import get_pref, is_mac, log_err
 
 try:
     from CoreFoundation import (

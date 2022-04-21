@@ -1,16 +1,10 @@
 #!/usr/local/autopkg/python
-from urllib.parse import urlparse
 import os
+from urllib.parse import urlparse
 
-from autopkglib.git import run_git, git_cmd, GitError
-from autopkglib import (
-    get_pref,
-    log,
-    log_err,
-)
-from autopkglib.prefs import (
-    get_search_dirs,
-)
+from autopkglib import get_pref, log, log_err
+from autopkglib.git import GitError, git_cmd, run_git
+from autopkglib.prefs import get_search_dirs
 
 
 def expand_repo_url(url):

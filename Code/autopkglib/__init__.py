@@ -27,9 +27,8 @@ from distutils.version import LooseVersion
 from typing import IO, Dict, List, Optional
 
 import pkg_resources
-
-from autopkglib.recipes import remove_recipe_extension, find_recipe_by_identifier
-from autopkglib.prefs import Preferences, NSArray, NSDictionary, VarDict, FileOrPath
+from autopkglib.prefs import FileOrPath, NSArray, NSDictionary, Preferences, VarDict
+from autopkglib.recipes import find_recipe_by_identifier, remove_recipe_extension
 
 
 def is_mac():

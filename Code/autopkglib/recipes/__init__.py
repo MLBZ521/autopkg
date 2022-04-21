@@ -1,22 +1,23 @@
 #!/usr/local/autopkg/python
 
+import difflib
+import glob
 import os
 import plistlib
-import yaml
-import glob
 import pprint
-import difflib
 
-from .. import RECIPE_EXTS, get_pref, log, log_err, version_equal_or_greater
+import yaml
 from autopkglib.github import (
     GitHubSession,
-    print_gh_search_results,
     do_gh_repo_contents_fetch,
+    print_gh_search_results,
 )
-from autopkglib.prefs import (
-    get_override_dirs,
-    get_search_dirs,
-)
+from autopkglib.prefs import get_override_dirs, get_search_dirs
+
+from .. import get_pref, log, log_err, version_equal_or_greater
+
+# Supported recipe extensions
+RECIPE_EXTS = (".recipe", ".recipe.plist", ".recipe.yaml")
 
 
 class RecipeLoadingException(Exception):
