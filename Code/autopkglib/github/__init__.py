@@ -20,6 +20,7 @@ import json
 import os
 import re
 import tempfile
+from base64 import b64decode
 from typing import List, Optional
 from urllib.parse import quote
 
@@ -305,3 +306,34 @@ def print_gh_search_results(results_items):
         else:
             repo_name = repo["full_name"]
         print(format_str % (name, repo_name, path))
+
+
+def do_gh_repo_contents_fetch(
+    repo: str, path: str, use_token=False, decode=True
+) -> Optional[bytes]:
+    """Fetch file contents from GitHub and return as a string."""
+    gh_session = GitHubSession()
+    if use_token:
+        gh_session.setup_token()
+    # Do the search, including text match metadata
+    (results, code) = gh_session.call_api(
+        f"/repos/autopkg/{repo}/contents/{quote(path)}"
+    )
+
+    if code == 403:
+        log_err(
+            "You've probably hit the GitHub's search rate limit, officially 5 "
+            "requests per minute.\n"
+        )
+        if results:
+            log_err("Server response follows:\n")
+            log_err(results.get("message", None))
+            log_err(results.get("documentation_url", None))
+
+        return None
+    if results is None or code is None:
+        log_err("A GitHub API error occurred!")
+        return None
+    if decode:
+        return b64decode(results["content"])
+    return results["content"]
