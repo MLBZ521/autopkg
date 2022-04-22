@@ -24,8 +24,9 @@ from base64 import b64decode
 from typing import List, Optional
 from urllib.parse import quote
 
-from autopkglib import RECIPE_EXTS, get_pref, log, log_err
 from autopkglib.URLGetter import URLGetter
+from autopkglib.common import log, log_err, RECIPE_EXTS
+from autopkglib.prefs import get_pref
 
 BASE_URL = "https://api.github.com"
 TOKEN_LOCATION = os.path.expanduser("~/.autopkg_gh_token")

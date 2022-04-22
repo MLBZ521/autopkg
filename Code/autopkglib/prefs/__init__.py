@@ -8,7 +8,7 @@ from typing import IO, Any, Dict, Optional, Union
 
 import appdirs
 
-from .. import get_pref, is_mac, log_err
+from autopkglib.common import is_mac, log_err, NSArray, NSDictionary, NSNumber
 
 try:
     from CoreFoundation import (
@@ -21,7 +21,6 @@ try:
         kCFPreferencesCurrentHost,
         kCFPreferencesCurrentUser,
     )
-    from Foundation import NSArray, NSDictionary, NSNumber
 except ImportError:
     if is_mac():
         print(
@@ -33,10 +32,6 @@ except ImportError:
             "CFPreferencesAppSynchronize, ...' in " + __name__
         )
         raise
-    # On non-macOS platforms, the above imported names are stubbed out.
-    NSArray = list
-    NSDictionary = dict
-    NSNumber = int
 
     def CFPreferencesAppSynchronize(*args, **kwargs):
         pass
@@ -54,7 +49,6 @@ except ImportError:
     kCFPreferencesAnyUser = None
     kCFPreferencesCurrentUser = None
     kCFPreferencesCurrentHost = None
-
 
 APP_NAME = "Autopkg"
 BUNDLE_ID = "com.github.autopkg"
@@ -246,6 +240,10 @@ class Preferences:
             log_err(f"WARNING: Preference change {key}=''{value}'' was not saved.")
 
 
+# Set the global preferences object
+globalPreferences = Preferences()
+
+
 def get_search_dirs():
     """Return search dirs from preferences or default list"""
     default = [".", "~/Library/AutoPkg/Recipes", "/Library/AutoPkg/Recipes"]
@@ -266,3 +264,19 @@ def get_override_dirs():
         # convert a string to a list
         dirs = [dirs]
     return dirs or default
+
+
+def get_pref(key):
+    """Return a single pref value (or None) for a domain."""
+    return globalPreferences.get_pref(key)
+
+
+def set_pref(key, value):
+    """Sets a preference for domain"""
+    globalPreferences.set_pref(key, value)
+
+
+def get_all_prefs():
+    """Return a dict (or an empty dict) with the contents of all
+    preferences in the domain."""
+    return globalPreferences.get_all_prefs()

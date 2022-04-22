@@ -9,6 +9,7 @@ from textwrap import dedent
 from unittest.mock import mock_open, patch
 
 import autopkglib
+import autopkglib.common
 
 autopkg = imp.load_source(
     "autopkg", os.path.join(os.path.dirname(__file__), "..", "autopkg")
@@ -139,46 +140,46 @@ class TestAutoPkg(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @patch("autopkglib.sys")
+    @patch("autopkglib.common.sys")
     def test_is_mac_returns_true_on_mac(self, mock_sys):
         """On macOS, is_mac() should return True."""
         mock_sys.platform = "Darwin-somethingsomething"
-        result = autopkglib.is_mac()
+        result = autopkglib.common.is_mac()
         self.assertEqual(result, True)
 
-    @patch("autopkglib.sys")
+    @patch("autopkglib.common.sys")
     def test_is_mac_returns_false_on_not_mac(self, mock_sys):
         """On not-macOS, is_mac() should return False."""
         mock_sys.platform = "Win32-somethingsomething"
-        result = autopkglib.is_mac()
+        result = autopkglib.common.is_mac()
         self.assertEqual(result, False)
 
-    @patch("autopkglib.sys")
+    @patch("autopkglib.common.sys")
     def test_is_windows_returns_true_on_windows(self, mock_sys):
         """On Windows, is_windows() should return True."""
         mock_sys.platform = "Win32-somethingsomething"
-        result = autopkglib.is_windows()
+        result = autopkglib.common.is_windows()
         self.assertEqual(result, True)
 
-    @patch("autopkglib.sys")
+    @patch("autopkglib.common.sys")
     def test_is_windows_returns_false_on_not_windows(self, mock_sys):
         """On not-Windows, is_windows() should return False."""
         mock_sys.platform = "Darwin-somethingsomething"
-        result = autopkglib.is_windows()
+        result = autopkglib.common.is_windows()
         self.assertEqual(result, False)
 
-    @patch("autopkglib.sys")
+    @patch("autopkglib.common.sys")
     def test_is_linux_returns_true_on_linux(self, mock_sys):
         """On Linux, is_linux() should return True."""
         mock_sys.platform = "Linux-somethingsomething"
-        result = autopkglib.is_linux()
+        result = autopkglib.common.is_linux()
         self.assertEqual(result, True)
 
-    @patch("autopkglib.sys")
+    @patch("autopkglib.common.sys")
     def test_is_linux_returns_false_on_not_linux(self, mock_sys):
         """On not-Linux, is_linux() should return False."""
         mock_sys.platform = "Win32-somethingsomething"
-        result = autopkglib.is_linux()
+        result = autopkglib.common.is_linux()
         self.assertEqual(result, False)
 
     @patch("autopkglib.sys")

@@ -2,7 +2,7 @@
 
 import subprocess
 
-from .. import find_binary
+from autopkglib.common import find_binary
 
 
 def git_cmd():

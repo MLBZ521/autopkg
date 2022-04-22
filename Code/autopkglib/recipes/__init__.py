@@ -12,12 +12,9 @@ from autopkglib.github import (
     do_gh_repo_contents_fetch,
     print_gh_search_results,
 )
-from autopkglib.prefs import get_override_dirs, get_search_dirs
+from autopkglib.prefs import get_override_dirs, get_search_dirs, get_pref
 
-from .. import get_pref, log, log_err, version_equal_or_greater
-
-# Supported recipe extensions
-RECIPE_EXTS = (".recipe", ".recipe.plist", ".recipe.yaml")
+from autopkglib.common import log, log_err, version_equal_or_greater, RECIPE_EXTS
 
 
 class RecipeLoadingException(Exception):
