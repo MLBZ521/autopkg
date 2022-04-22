@@ -61,12 +61,19 @@ from autopkglib.recipes import (
     recipe_in_override_dir,
 )
 from autopkglib.repos import add_repo, expand_repo_url
+from autopkglib.autopkgyaml import autopkg_str_representer
 
 # Catch Python 2 wrappers with an early f-string. Message must be on a single line.
 _ = f"""{sys.version_info.major} It looks like you're running the autopkg tool with an incompatible version of Python. Please update your script to use autopkg's included Python (/usr/local/autopkg/python). AutoPkgr users please note that AutoPkgr 1.5.1 and earlier is NOT compatible with autopkg 2. """  # noqa
 
 # If any recipe fails during 'autopkg run', return this exit code
 RECIPE_FAILED_CODE = 70
+
+# Override global yaml state with our str representer
+# See https://github.com/autopkg/autopkg/issues/768
+yaml.add_representer(str, autopkg_str_representer)
+# to use with safe_dump:
+yaml.representer.SafeRepresenter.add_representer(str, autopkg_str_representer)
 
 
 def print_version(argv):
