@@ -2689,12 +2689,109 @@ def new_recipe(argv):
         log_err(f"Failed to write recipe: {err}")
 
 
+def build_recipe_chain(argv):
+    """Build a recipe chain."""
+    verb = argv[1]
+    parser = gen_common_parser()
+    parser.set_usage(
+        f"Usage: %prog {verb} [options] [recipe ...]\nBuild a chain out of a recipe."
+    )
+    parser.add_option(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help=("Don't offer to search Github if a recipe can't " "be found."),
+    )
+    parser.add_option(
+        "-v", "--verbose", action="count", default=0, help="Verbose output."
+    )
+    add_search_and_override_dir_options(parser)
+    (options, arguments) = common_parse(parser, argv)
+    recipe_name = arguments[0]
+
+    override_dirs = options.override_dirs or get_override_dirs()
+    search_dirs = options.search_dirs or get_search_dirs()
+
+    # initialize some variables
+    failures = []
+    error_count = 0
+
+    # get our list of recipes
+    if not recipe_name:
+        log_err(parser.get_usage())
+        return -1
+
+    chain_dir = get_pref("RECIPE_CHAIN_DIR") or "~/Library/AutoPkg/RecipeChains"
+    chain_dir = os.path.expanduser(chain_dir)
+    if not os.path.exists(chain_dir):
+        os.makedirs(chain_dir, 0o755)
+    target_chain_path = os.path.join(chain_dir, recipe_name + ".chain.recipe")
+
+    make_suggestions = True
+    if options.quiet:
+        # don't make suggestions or search Github if told to be quiet
+        make_suggestions = False
+
+    recipe = load_recipe(
+        recipe_name,
+        override_dirs,
+        search_dirs,
+        [],
+        [],
+        make_suggestions=make_suggestions,
+        search_github=make_suggestions,
+    )
+    if not recipe:
+        if not make_suggestions:
+            log_err(f"No valid recipe found for {recipe_name}")
+        return -1
+
+    log(f"Assembling chain for {recipe_name}...")
+
+    # Create a local copy of preferences
+    prefs = copy.deepcopy(dict(get_all_prefs()))
+    # Add RECIPE_PATH and RECIPE_DIR variables for use by processors
+    prefs["RECIPE_PATH"] = os.path.abspath(recipe["RECIPE_PATH"])
+    prefs["RECIPE_DIR"] = os.path.dirname(prefs["RECIPE_PATH"])
+    prefs["PARENT_RECIPES"] = recipe.get("PARENT_RECIPES", [])
+    # Update search locations that may have been overridden with CLI or
+    # environment variables
+    prefs["RECIPE_SEARCH_DIRS"] = search_dirs
+    prefs["RECIPE_OVERRIDE_DIRS"] = override_dirs
+
+    # Add our verbosity level
+    prefs["verbose"] = options.verbose
+
+    autopackager = AutoPackager(options, prefs)
+
+    try:
+        autopackager.verify(recipe)
+        recipe["Identifier"] = recipe["Identifier"].replace("local", "chain")
+    except AutoPackagerError as err:
+        error_count += 1
+        failure = {}
+        if isinstance(err, (TrustVerificationWarning, TrustVerificationError)):
+            log_err("Failed local trust verification.")
+        else:
+            log_err("Failed.")
+        failure["recipe"] = recipe_name
+        failure["message"] = str(err)
+        failure["traceback"] = traceback.format_exc()
+        failures.append(failure)
+        autopackager.results.append({"RecipeError": str(err).rstrip()})
+    log("Recipe chain verified!")
+    with open(target_chain_path, "wb") as f:
+        plistlib.dump(recipe, f)
+        log("Chain stored at " + target_chain_path)
+
+
 def main(argv):
     """Main routine"""
     # define our subcommands ('verbs')
     subcommands = {
         "help": {"function": display_help, "help": "Display this help"},
         "audit": {"function": audit, "help": "Audit one or more recipes."},
+        "build": {"function": build_recipe_chain, "help": "Build a recipe chain."},
         "info": {
             "function": get_info,
             "help": "Get info about configuration or a recipe",
