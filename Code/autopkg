@@ -2767,6 +2767,8 @@ def build_recipe_chain(argv):
     try:
         autopackager.verify(recipe)
         recipe["Identifier"] = recipe["Identifier"].replace("local", "chain")
+        if (recipe.get("ParentRecipe")):
+            del recipe["ParentRecipe"]
     except AutoPackagerError as err:
         error_count += 1
         failure = {}
