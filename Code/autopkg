@@ -334,7 +334,8 @@ def load_recipe(
     # identifier.
     if name.startswith("local."):
         log_err(
-            f"AutoPkg cannot locate overrides by identifiers. Please use the recipe name instead."
+            "AutoPkg cannot locate overrides by identifiers. "
+            "Please use the recipe name instead."
         )
         return
     # if recipe_in_override_dir(recipe_file, override_dirs):
@@ -983,9 +984,6 @@ def processor_info(argv):
     # Parse arguments
     add_search_and_override_dir_options(parser)
     (options, arguments) = common_parse(parser, argv)
-
-    override_dirs = options.override_dirs or get_override_dirs()
-    search_dirs = options.search_dirs or get_search_dirs()
 
     if len(arguments) != 1:
         log_err("Need exactly one processor name")
@@ -2467,9 +2465,6 @@ def audit(argv):
     )
     (options, arguments) = common_parse(parser, argv)
 
-    override_dirs = options.override_dirs or get_override_dirs()
-    search_dirs = options.search_dirs or get_search_dirs()
-
     # these processors download items
     DOWNLOAD_PROCESSORS = {"CURLDownloader", "URLDownloader"}
 
@@ -2493,9 +2488,6 @@ def audit(argv):
     if options.recipe_list:
         recipe_list = parse_recipe_list(options.recipe_list)
         recipe_paths.extend(recipe_list.get("recipes", []))
-
-    override_dirs = options.override_dirs or get_override_dirs()
-    search_dirs = options.search_dirs or get_search_dirs()
 
     if not recipe_paths:
         log_err(parser.get_usage())
